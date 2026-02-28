@@ -1,86 +1,136 @@
-const express = require('express');
-const fs = require('fs');
-const app = express();
+import express from 'express';
+import models from './models.js';
 
-// parse incoming JSON payloads from the iOS app
+// pull specific model constructors for convenience
+const { User, Request, Application } = models;
+
+const app = express();
 app.use(express.json()); 
 
-const DB_FILE = './database.json';
-
-// helper functions to read and write to the JSON file
-const readDB = () => JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-const writeDB = (data) => fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-
-// load data
-app.get('/db', (req, res) => {
-    res.json(readDB());
+// AUTH Endpoints
+// iOS will POST: { "username": "...", "password": "...", "role": "owner" }
+app.post('/login', async (req, res) => {
+    const { username, password, role } = req.body;
+    try {
+        let user = await models.User.findOne({ username });
+        
+        if (user) {
+            if (user.password === password) {
+                return res.status(200).json(user);
+            } else {
+                return res.status(401).json({ error: "Invalid password" });
+            }
+        } else {
+            // Auto-register if user doesn't exist
+            const newUser = new User({ username, password, role, contactInfo: "Not set", bio: "" });
+            await newUser.save();
+            return res.status(201).json(newUser);
+        }
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-// create a new job
-app.post('/jobs', (req, res) => {
-    const db = readDB();
-    const newJob = {
-        id: 'job_' + Date.now(), // creates a unique ID based on the current timestamp
-        owner_id: req.body.owner_id,
-        pet_details: req.body.pet_details,
-        status: 'open',
-        applicants: [],
-        approved_sitter_id: null
-    };
-    
-    db.jobs.push(newJob);
-    writeDB(db); 
-    res.status(201).json(newJob); 
+// Fetch a specific user profile (to see contact info/bio)
+app.get('/users/:id', async (req, res) => {
+    try {
+        const user = await models.User.findById(req.params.id);
+        res.json(user);
+    } catch (err) {
+        res.status(404).json({ error: "User not found" });
+    }
 });
 
-// apply for a job
-app.put('/jobs/:id/apply', (req, res) => {
-    const db = readDB();
-    const job = db.jobs.find(j => j.id === req.params.id);
-    
-    if (!job) {
-        return res.status(404).send('Job not found');
+
+// REQUEST Endpoints
+// 1. Post a new Sitting Request (Owner Side)
+// iOS will POST: { "ownerId": "...", "ownerName": "...", "title": "...", "petName": "...", "description": "...", "dates": "..." }
+app.post('/requests', async (req, res) => {
+    try {
+        const newRequest = new Request(req.body);
+        await newRequest.save();
+        res.status(201).json(newRequest);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
     }
-
-    const sitterId = req.body.sitter_id;
-
-    // don't let the owner apply for their own job
-    if (job.owner_id === sitterId) {
-        return res.status(400).send('You cannot apply for your own job.');
-    }
-
-    // prevent the same user from applying twice
-    if (job.applicants.includes(sitterId)) {
-        return res.status(400).send('You have already applied for this job.');
-    }
-
-    // if they pass the checks, add them to the applicants list
-    job.applicants.push(sitterId);
-    job.status = 'pending_approval'; 
-    writeDB(db);
-    res.json(job);
 });
 
-// approve a sitter
-app.put('/jobs/:id/approve', (req, res) => {
-    const db = readDB();
-    const job = db.jobs.find(j => j.id === req.params.id);
-    
-    if (!job) {
-        return res.status(404).send('Job not found');
+// 2. Fetch all OPEN requests (Sitter Side Feed)
+// This populates the "Sitter Feed" TableView in iOS
+app.get('/requests', async (req, res) => {
+    try {
+        // We only want requests that haven't been finalized yet
+        const openRequests = await Request.find({ status: 'open' }).sort({ _id: -1 });
+        res.json(openRequests);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-
-    // is the person tapping 'Approve' the actual owner of the job?
-    if (job.owner_id !== req.body.current_user_id) {
-        return res.status(403).send('Only the job owner can approve sitters.');
-    }
-
-    // update the job to lock in the match
-    job.approved_sitter_id = req.body.sitter_id;
-    job.status = 'matched';
-    writeDB(db);
-    res.json(job);
 });
 
-// start server
+// 3. Fetch requests created by a specific owner (Owner Dashboard)
+app.get('/requests/owner/:ownerId', async (req, res) => {
+    try {
+        const myRequests = await Request.find({ ownerId: req.params.ownerId }).sort({ _id: -1 });
+        res.json(myRequests);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+
+// APPLICATION Endpoints
+// 1. Sitter applies for a job
+// iOS will POST: { "requestId": "...", "sitterId": "...", "sitterName": "..." }
+app.post('/applications', async (req, res) => {
+    try {
+        // Prevent duplicate applications
+        const existing = await Application.findOne({ 
+            requestId: req.body.requestId, 
+            sitterId: req.body.sitterId 
+        });
+        
+        if (existing) {
+            return res.status(400).json({ error: "Already applied for this job" });
+        }
+
+        const newApp = new Application(req.body);
+        await newApp.save();
+        res.status(201).json(newApp);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
+// 2. Owner views applicants for a specific request
+// Used for the "Applicant List" screen
+app.get('/requests/:requestId/applicants', async (req, res) => {
+    try {
+        const applicants = await Application.find({ requestId: req.params.requestId });
+        res.json(applicants);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3. Owner approves a specific application
+// iOS will PATCH: { "status": "approved" }
+app.patch('/applications/:id', async (req, res) => {
+    try {
+        const updatedApp = await Application.findByIdAndUpdate(
+            req.params.id, 
+            { status: req.body.status }, 
+            { new: true }
+        );
+        
+        // If approved, automatically close the Request
+        if (req.body.status === 'approved') {
+            await Request.findByIdAndUpdate(updatedApp.requestId, { status: 'closed' });
+        }
+        
+        res.json(updatedApp);
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 app.listen(3000, () => console.log('Pet Sitter backend running on port 3000!'));
