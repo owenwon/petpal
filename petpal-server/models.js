@@ -13,27 +13,35 @@ mongoose.connect(connectionString)
   .then(() => console.log('Connected to MongoDB!'))
   .catch(err => console.error('Connection error', err));
 
-// UserSchema
+// UserSchema (the profile)
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true }, 
   role: { type: String, enum: ['owner', 'sitter'], required: true },
+  headline: String,   // E.g., Owner "Needs a patient walker for energetic huskry", Sitter "Experienced dog lover available for weekend sitting"
+  location: String,      // E.g., "San Francisco, CA"
+  bio: String,
   contactInfo: String,
-  bio: String
+  experience: String  // null for owners, 5 years for sitters for example
 });
 
-// RequestSchema
+// RequestSchema (the job post)
 const requestSchema = new mongoose.Schema({
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   ownerName: String, 
-  title: String,
+  title: String,    // e.g. "Need a sitter for my dog"... "weekend sitting for Luna"
   petName: String,
+  breed: String,      
+  age: Number,      
+  weight: Number,    
   description: String,
+  imageUrl: { type: String, default: "" },  // optional user story; field for pet image URL; 
+  price: Number,      
   dates: String,
   status: { type: String, default: 'open' } // 'open' or 'closed'
 });
 
-// ApplicationSchema
+// ApplicationSchema (the sitter's application to a request)
 const applicationSchema = new mongoose.Schema({
   requestId: { type: mongoose.Schema.Types.ObjectId, ref: 'Request', required: true },
   sitterId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
