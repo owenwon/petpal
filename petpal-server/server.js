@@ -8,24 +8,22 @@ const app = express();
 app.use(express.json()); 
 
 // AUTH Endpoints
-// iOS will POST: { "username": "...", "password": "...", "role": "owner" }
+// We will pre-populate 2 users, during demo when one of the button is clicked, This endpoint
+// will be hit with hard coded input of 1 of 2 existing users and their info will be returned 
 app.post('/login', async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password } = req.body;
     try {
-        let user = await models.User.findOne({ username });
+        let user = await User.findOne({ username });
         
         if (user) {
+            // What happens during the demo: 
+            // It finds the pre-populated user we made in Postman
             if (user.password === password) {
                 return res.status(200).json(user);
             } else {
                 return res.status(401).json({ error: "Invalid password" });
             }
-        } else {
-            // Auto-register if user doesn't exist
-            const newUser = new User({ username, password, role, contactInfo: "Not set", bio: "" });
-            await newUser.save();
-            return res.status(201).json(newUser);
-        }
+        } 
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -83,17 +81,29 @@ app.get('/requests/owner/:ownerId', async (req, res) => {
 // iOS will POST: { "requestId": "...", "sitterId": "...", "sitterName": "..." }
 app.post('/applications', async (req, res) => {
     try {
+        const { requestId, sitterId, sitterName } = req.body;
+
         // Prevent duplicate applications
-        const existing = await Application.findOne({ 
-            requestId: req.body.requestId, 
-            sitterId: req.body.sitterId 
-        });
-        
+        const existing = await Application.findOne({ requestId, sitterId });
         if (existing) {
             return res.status(400).json({ error: "Already applied for this job" });
         }
+        
+        // Find the OG request to grab owner details for the sitter's view and for the "Contact Reveal" if approved
+        const parentRequest = await Request.findById(requestId);
+        if (!parentRequest) {
+            return res.status(404).json({ error: "Request not found" });
+        }
 
-        const newApp = new Application(req.body);
+        const newApp = new Application({
+            requestId,
+            sitterId,
+            sitterName,
+            requestTitle: parentRequest.title, // Saved so sitter sees job name in "Apps"
+            ownerId: parentRequest.ownerId,    // Saved for the "Contact Reveal" -- Need this fetch Owner's info
+            ownerName: parentRequest.ownerName // Saved for display
+        });
+
         await newApp.save();
         res.status(201).json(newApp);
     } catch (err) {
@@ -102,7 +112,7 @@ app.post('/applications', async (req, res) => {
 });
 
 // 2. Owner views applicants for a specific request
-// Used for the "Applicant List" screen
+// I.e., When an owner clicks their own post to see applications 
 app.get('/requests/:requestId/applicants', async (req, res) => {
     try {
         const applicants = await Application.find({ requestId: req.params.requestId });
@@ -122,7 +132,7 @@ app.patch('/applications/:id', async (req, res) => {
             { new: true }
         );
         
-        // If approved, automatically close the Request
+        // If approved, mark the job as 'closed' so it hard filters from the public feed
         if (req.body.status === 'approved') {
             await Request.findByIdAndUpdate(updatedApp.requestId, { status: 'closed' });
         }
@@ -130,6 +140,17 @@ app.patch('/applications/:id', async (req, res) => {
         res.json(updatedApp);
     } catch (err) {
         res.status(400).json({ error: err.message });
+    }
+});
+
+// 4. "My Account > Apps"
+// Allows a user to see the status of all jobs they've applied for
+app.get('/applications/sitter/:sitterId', async (req, res) => {
+    try {
+        const myApps = await Application.find({ sitterId: req.params.sitterId }).sort({ _id: -1 });
+        res.json(myApps);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
