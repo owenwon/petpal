@@ -8,6 +8,21 @@ const app = express();
 app.use(express.json()); 
 
 // AUTH Endpoints
+// 1-time endpoint used to seed 2 demo users
+// POST { "username": "User 1", "password": "...", "headline": "...", etc. }
+app.post('/admin/create-user', async (req, res) => {
+    try {
+        const newUser = new User(req.body);
+        await newUser.save();
+        res.status(201).json({
+            message: "User created successfully!",
+            user: newUser
+        });
+    } catch (err) {
+        res.status(400).json({ error: err.message });
+    }
+});
+
 // We will pre-populate 2 users, during demo when one of the button is clicked, This endpoint
 // will be hit with hard coded input of 1 of 2 existing users and their info will be returned 
 app.post('/login', async (req, res) => {
