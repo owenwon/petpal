@@ -124,12 +124,13 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
                 
                 URLSession.shared.dataTask(with: url) { data, response, error in
                     if let data = data {
-                        do {
-                            let ownerProfile = try JSONDecoder().decode(UserResponse.self, from: data)
-                            DispatchQueue.main.async {
+                        DispatchQueue.main.async {
+                            do {
+                                let ownerProfile = try JSONDecoder().decode(UserResponse.self, from: data)
                                 self.performSegue(withIdentifier: "showMatchProfile", sender: ownerProfile)
-                            }
-                        } catch { print("Failed to decode owner: \(error)") }
+                                
+                            } catch { print("Failed to decode owner: \(error)") }
+                        }
                     }
                 }.resume()
                 

@@ -75,12 +75,13 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let data = data {
-                do {
-                    let sitterProfile = try JSONDecoder().decode(UserResponse.self, from: data)
-                    DispatchQueue.main.async {
+                DispatchQueue.main.async {
+                    do {
+                        let sitterProfile = try JSONDecoder().decode(UserResponse.self, from: data)
                         self.performSegue(withIdentifier: "showSitterProfile", sender: sitterProfile)
-                    }
-                } catch { print("Failed to decode sitter: \(error)") }
+                        
+                    } catch { print("Failed to decode sitter: \(error)") }
+                }
             }
         }.resume()
     }
