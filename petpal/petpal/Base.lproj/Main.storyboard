@@ -168,6 +168,7 @@
                     <connections>
                         <outlet property="segmentedControl" destination="JlT-El-IEe" id="nBW-qw-ADT"/>
                         <outlet property="tableView" destination="XcZ-yA-WY5" id="y0Z-rY-uVx"/>
+                        <segue destination="Z8h-bp-QM7" kind="presentation" identifier="showMatchProfile" id="pjU-hZ-aM4"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="9zQ-0v-q1W" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -461,22 +462,90 @@
                         <outlet property="descriptionLabel" destination="owZ-ed-Pzo" id="4hO-Vu-fTX"/>
                         <outlet property="locationLabel" destination="K9H-ZR-UmR" id="wSG-H6-Lj8"/>
                         <outlet property="titleLabel" destination="hm6-wN-b3U" id="vCh-OK-Fxx"/>
+                        <segue destination="cIe-aK-IN4" kind="show" identifier="showApplicants" id="LcU-V6-v87"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="VNM-0w-QbU" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4074" y="187"/>
+            <point key="canvasLocation" x="4073" y="201"/>
         </scene>
-        <!--View Controller-->
+        <!--Applicants View Controller-->
         <scene sceneID="pJs-Ph-ZNo">
             <objects>
-                <viewController id="cIe-aK-IN4" sceneMemberID="viewController">
+                <viewController id="cIe-aK-IN4" customClass="ApplicantsViewController" customModule="petpal" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7jx-yP-kXS">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="nHx-Hc-ddj">
+                                <rect key="frame" x="0.0" y="113" width="393" height="656"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="ApplicantCell" id="J3q-xW-LEa" customClass="ApplicantCell" customModule="petpal" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="67.333335876464844"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="J3q-xW-LEa" id="KJQ-dm-3zz">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="67.333335876464844"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <stackView opaque="NO" contentMode="scaleToFill" alignment="center" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="Yoe-85-ol8">
+                                                    <rect key="frame" x="16" y="16.000000000000004" width="361" height="35.333333333333343"/>
+                                                    <subviews>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2v0-Gu-bTk">
+                                                            <rect key="frame" x="0.0" y="7.6666666666666696" width="195.33333333333334" height="20.333333333333329"/>
+                                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                            <nil key="textColor"/>
+                                                            <nil key="highlightedColor"/>
+                                                        </label>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="R5R-Mh-eXm">
+                                                            <rect key="frame" x="203.33333333333334" y="0.66666666666666785" width="77.666666666666657" height="34.333333333333329"/>
+                                                            <state key="normal" title="Button"/>
+                                                            <buttonConfiguration key="configuration" style="filled" title="Accept"/>
+                                                            <connections>
+                                                                <action selector="acceptTapped:" destination="J3q-xW-LEa" eventType="touchUpInside" id="C1f-tc-bpu"/>
+                                                            </connections>
+                                                        </button>
+                                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="77F-em-Sbm">
+                                                            <rect key="frame" x="289" y="0.66666666666666785" width="72" height="34.333333333333329"/>
+                                                            <state key="normal" title="Button"/>
+                                                            <buttonConfiguration key="configuration" style="filled" title="Reject"/>
+                                                            <connections>
+                                                                <action selector="rejectTapped:" destination="J3q-xW-LEa" eventType="touchUpInside" id="HQP-IE-KO8"/>
+                                                            </connections>
+                                                        </button>
+                                                    </subviews>
+                                                </stackView>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="Yoe-85-ol8" secondAttribute="trailing" constant="16" id="2ke-Hm-dWs"/>
+                                                <constraint firstAttribute="bottom" secondItem="Yoe-85-ol8" secondAttribute="bottom" constant="16" id="EA5-Tb-QSf"/>
+                                                <constraint firstItem="Yoe-85-ol8" firstAttribute="top" secondItem="KJQ-dm-3zz" secondAttribute="top" constant="16" id="YWx-7b-5NL"/>
+                                                <constraint firstItem="Yoe-85-ol8" firstAttribute="leading" secondItem="KJQ-dm-3zz" secondAttribute="leading" constant="16" id="c5g-4l-CZX"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="acceptButton" destination="R5R-Mh-eXm" id="pqv-AY-ULQ"/>
+                                            <outlet property="nameLabel" destination="2v0-Gu-bTk" id="ogM-94-Xke"/>
+                                            <outlet property="rejectButton" destination="77F-em-Sbm" id="zrk-JQ-CcI"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
                         <viewLayoutGuide key="safeArea" id="cgw-HG-Zdy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="nHx-Hc-ddj" firstAttribute="leading" secondItem="cgw-HG-Zdy" secondAttribute="leading" id="API-SG-tBH"/>
+                            <constraint firstItem="cgw-HG-Zdy" firstAttribute="trailing" secondItem="nHx-Hc-ddj" secondAttribute="trailing" id="RuS-5E-lFt"/>
+                            <constraint firstItem="nHx-Hc-ddj" firstAttribute="top" secondItem="cgw-HG-Zdy" secondAttribute="top" id="c8e-vp-6fn"/>
+                            <constraint firstItem="cgw-HG-Zdy" firstAttribute="bottom" secondItem="nHx-Hc-ddj" secondAttribute="bottom" id="sJx-mO-WeM"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="oWp-r6-la5"/>
+                    <connections>
+                        <outlet property="tableView" destination="nHx-Hc-ddj" id="ecD-dh-rvy"/>
+                        <segue destination="Z8h-bp-QM7" kind="presentation" identifier="showSitterProfile" id="mvJ-hC-AzG"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OJB-BI-xD1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -541,8 +610,8 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="GYd-9s-0RO"/>
-        <segue reference="Bef-Xp-dah"/>
+        <segue reference="GPx-eG-dMy"/>
+        <segue reference="mvJ-hC-AzG"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="person.crop.circle.fill" catalog="system" width="128" height="123"/>

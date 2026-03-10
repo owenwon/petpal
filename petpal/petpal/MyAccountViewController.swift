@@ -12,6 +12,9 @@ struct ApplicationResponse: Codable {
     let requestId: String
     let requestTitle: String?
     let ownerName: String?
+    let ownerId: String?
+    let sitterId: String?
+    let sitterName: String?
     let status: String
 }
 
@@ -112,9 +115,34 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
         tableView.deselectRow(at: indexPath, animated: true)
         
         if segmentedControl.selectedSegmentIndex == 1 {
-            let alert = UIAlertController(title: "Application Pending", message: "The owner hasn't accepted your application yet.", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default))
-            self.present(alert, animated: true)
+            let app = myApplications[indexPath.row]
+            
+            if app.status == "approved" {
+                guard let ownerId = app.ownerId else { return }
+                
+                guard let url = URL(string: "https://petpal-acd6.onrender.com/users/\(ownerId)") else { return }
+                
+                URLSession.shared.dataTask(with: url) { data, response, error in
+                    if let data = data {
+                        do {
+                            let ownerProfile = try JSONDecoder().decode(UserResponse.self, from: data)
+                            DispatchQueue.main.async {
+                                self.performSegue(withIdentifier: "showMatchProfile", sender: ownerProfile)
+                            }
+                        } catch { print("Failed to decode owner: \(error)") }
+                    }
+                }.resume()
+                
+            } else if app.status == "rejected" {
+                let alert = UIAlertController(title: "Application Rejected", message: "The owner went with another sitter for this job.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+                
+            } else {
+                let alert = UIAlertController(title: "Application Pending", message: "The owner hasn't accepted your application yet.", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default))
+                self.present(alert, animated: true)
+            }
         }
     }
     
@@ -125,6 +153,12 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
                let indexPath = tableView.indexPathForSelectedRow {
                 let destinationVC = segue.destination as! JobDetailViewController
                 destinationVC.job = postedJobs[indexPath.row]
+            }
+        } else if segue.identifier == "showMatchProfile" {
+            let destinationVC = segue.destination as! ProfileViewController
+            if let matchedUser = sender as? UserResponse {
+                destinationVC.userToShow = matchedUser
+                destinationVC.isMatch = true
             }
         }
     }

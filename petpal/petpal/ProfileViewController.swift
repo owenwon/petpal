@@ -15,17 +15,28 @@ class ProfileViewController: UIViewController {
     @IBOutlet weak var contactInfoLabel: UILabel!
     
     var userToShow: UserResponse?
+    var isMatch: Bool = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        let displayUser = userToShow ?? SessionManager.shared.currentUser
         
-        if let user = SessionManager.shared.currentUser {
+        if let user = displayUser {
             usernameLabel.text = user.username
             headlineLabel.text = user.headline ?? "No headline set"
             locationLabel.text = user.location ?? "Location unknown"
             bioLabel.text = user.bio ?? "No bio available"
-            contactInfoLabel.text = "Contact: \(user.contactInfo ?? "N/A")"
             
+            let isOwnProfile = user.username == SessionManager.shared.currentUser?.username
+            
+            if isMatch || isOwnProfile {
+                contactInfoLabel.text = "Contact: \(user.contactInfo ?? "N/A")"
+                contactInfoLabel.textColor = .label // Standard text color
+            } else {
+                contactInfoLabel.text = "Contact: 🔒 Hidden until approved"
+                contactInfoLabel.textColor = .lightGray
+            }
         } else {
             usernameLabel.text = "Error: User not found"
         }
