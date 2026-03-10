@@ -7,43 +7,124 @@
 
 import UIKit
 
+struct ApplicationResponse: Codable {
+    let _id: String
+    let requestId: String
+    let requestTitle: String?
+    let ownerName: String?
+    let status: String
+}
+
 class MyAccountViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     @IBOutlet weak var tableView: UITableView!
+    
+    var postedJobs: [JobRequest] = []
+    var myApplications: [ApplicationResponse] = []
+    
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        tableView.reloadData()
+        
+        if sender.selectedSegmentIndex == 0 {
+            fetchMyPostedJobs()
+        } else {
+            fetchMyApplications()
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
+        fetchMyPostedJobs()
+    }
+    
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        
+        if identifier == "showJobDetail" && segmentedControl.selectedSegmentIndex == 1 {
+            return false
+        }
+        
+        return true
+    }
+
+    // MARK: - Network Calls
+    func fetchMyPostedJobs() {
+        guard let currentUser = SessionManager.shared.currentUser else { return }
+        guard let url = URL(string: "https://petpal-acd6.onrender.com/requests/owner/\(currentUser._id)") else { return }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                do {
+                    self.postedJobs = try JSONDecoder().decode([JobRequest].self, from: data)
+                    DispatchQueue.main.async { self.tableView.reloadData() }
+                } catch { print("Failed to decode posts: \(error)") }
+            }
+        }.resume()
+    }
+    
+    func fetchMyApplications() {
+        guard let currentUser = SessionManager.shared.currentUser else { return }
+        guard let url = URL(string: "https://petpal-acd6.onrender.com/applications/sitter/\(currentUser._id)") else { return }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let data = data {
+                do {
+                    self.myApplications = try JSONDecoder().decode([ApplicationResponse].self, from: data)
+                    DispatchQueue.main.async { self.tableView.reloadData() }
+                } catch { print("Failed to decode applications: \(error)") }
+            }
+        }.resume()
     }
     
     // MARK: - Table View Functions
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return MockDatabase.jobs.count
+        if segmentedControl.selectedSegmentIndex == 0 {
+            return postedJobs.count
+        } else {
+            return myApplications.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "JobCell", for: indexPath) as! JobCell
         
-        let job = MockDatabase.jobs[indexPath.row]
-        
-        cell.titleLabel.text = job.title
-        cell.descriptionLabel.text = job.description
-        cell.locationLabel.text = job.location
-        cell.datesLabel.text = job.dates
+        if segmentedControl.selectedSegmentIndex == 0 {
+            let job = postedJobs[indexPath.row]
+            cell.titleLabel.text = job.title
+            cell.descriptionLabel.text = job.description
+            cell.datesLabel.text = job.dates
+            cell.locationLabel.text = "$\(job.price)/day • For \(job.petName)"
+        } else {
+            let app = myApplications[indexPath.row]
+            cell.titleLabel.text = app.requestTitle ?? "Unknown Job"
+            cell.descriptionLabel.text = "Status: \(app.status.uppercased())"
+            cell.datesLabel.text = ""
+            cell.locationLabel.text = "Owner: \(app.ownerName ?? "Unknown")"
+        }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        if segmentedControl.selectedSegmentIndex == 1 {
+            let alert = UIAlertController(title: "Application Pending", message: "The owner hasn't accepted your application yet.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            self.present(alert, animated: true)
+        }
     }
     
     // MARK: - Navigation Hand-Off
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showJobDetail" {
-            if let indexPath = tableView.indexPathForSelectedRow {
+            if segmentedControl.selectedSegmentIndex == 0,
+               let indexPath = tableView.indexPathForSelectedRow {
                 let destinationVC = segue.destination as! JobDetailViewController
-                let selectedJob = MockDatabase.jobs[indexPath.row]
-                destinationVC.job = selectedJob
+                destinationVC.job = postedJobs[indexPath.row]
             }
         }
     }
