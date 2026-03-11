@@ -34,7 +34,7 @@ class ProfileViewController: UIViewController {
                 contactInfoLabel.text = "Contact: \(user.contactInfo ?? "N/A")"
                 contactInfoLabel.textColor = .label // Standard text color
             } else {
-                contactInfoLabel.text = "Contact: 🔒 Hidden until approved"
+                contactInfoLabel.text = "Contact: Hidden until approved"
                 contactInfoLabel.textColor = .lightGray
             }
         } else {

@@ -61,7 +61,7 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
                     self.fetchApplicants()
                     
                     if newStatus == "approved", let sitterId = application.sitterId {
-                        self.fetchAndShowSitter(sitterId: sitterId)
+                        self.fetchAndShowSitter(sitterId: sitterId, isApproved: true)
                     }
                 } else {
                     print("Failed to update status.")
@@ -70,7 +70,7 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
         }.resume()
     }
     
-    func fetchAndShowSitter(sitterId: String) {
+    func fetchAndShowSitter(sitterId: String, isApproved: Bool) {
         guard let url = URL(string: "https://petpal-acd6.onrender.com/users/\(sitterId)") else { return }
         
         URLSession.shared.dataTask(with: url) { data, response, error in
@@ -78,7 +78,7 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
                 DispatchQueue.main.async {
                     do {
                         let sitterProfile = try JSONDecoder().decode(UserResponse.self, from: data)
-                        self.performSegue(withIdentifier: "showSitterProfile", sender: sitterProfile)
+                        self.performSegue(withIdentifier: "showSitterProfile", sender: (sitterProfile, isApproved))
                         
                     } catch { print("Failed to decode sitter: \(error)") }
                 }
@@ -118,6 +118,16 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
         return cell
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let applicant = applicants[indexPath.row]
+        
+        guard let sitterId = applicant.sitterId else { return }
+        let isApproved = (applicant.status == "approved")
+        self.fetchAndShowSitter(sitterId: sitterId, isApproved: isApproved)
+    }
+    
 
     
     // MARK: - Navigation
@@ -125,9 +135,9 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
      override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showSitterProfile" {
              let destinationVC = segue.destination as! ProfileViewController
-             if let sitter = sender as? UserResponse {
-                 destinationVC.userToShow = sitter
-                 destinationVC.isMatch = true
+             if let payload = sender as? (UserResponse, Bool){
+                 destinationVC.userToShow = payload.0
+                 destinationVC.isMatch = payload.1
              }
          }
      }
