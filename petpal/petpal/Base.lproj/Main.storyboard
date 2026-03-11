@@ -184,7 +184,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="2jd-dd-iO9">
-                                <rect key="frame" x="23.333333333333343" y="259" width="346.66666666666663" height="265"/>
+                                <rect key="frame" x="23.333333333333343" y="159" width="346.66666666666663" height="265"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Job Title (EX: Weekend Sitting)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PJh-F6-FzZ">
                                         <rect key="frame" x="0.0" y="0.0" width="346.66666666666669" height="37"/>
@@ -222,14 +222,27 @@
                                     <action selector="postJobTapped:" destination="o8n-oj-dNP" eventType="touchUpInside" id="Z9L-wY-kAy"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lJz-hc-1jK">
+                                <rect key="frame" x="10" y="20.000000000000004" width="76.666666666666671" height="34.333333333333343"/>
+                                <color key="tintColor" systemColor="systemRedColor"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Cancel"/>
+                                <connections>
+                                    <action selector="cancelTapped:" destination="o8n-oj-dNP" eventType="touchUpInside" id="ABV-8W-emL"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="qYu-MD-BuP"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="qYu-MD-BuP" firstAttribute="bottom" secondItem="fp9-IN-ZaS" secondAttribute="bottom" constant="30" id="0lm-G4-liI"/>
-                            <constraint firstItem="2jd-dd-iO9" firstAttribute="centerY" secondItem="UTt-ap-rvw" secondAttribute="centerY" id="QtR-Dq-MCZ"/>
+                            <constraint firstItem="fp9-IN-ZaS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qYu-MD-BuP" secondAttribute="leading" constant="20" id="CxX-Dm-Fwm"/>
+                            <constraint firstItem="lJz-hc-1jK" firstAttribute="leading" secondItem="qYu-MD-BuP" secondAttribute="leading" constant="10" id="Gyq-Jk-t7X"/>
+                            <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lJz-hc-1jK" secondAttribute="trailing" constant="20" id="LbB-Ch-ojr"/>
+                            <constraint firstItem="2jd-dd-iO9" firstAttribute="top" secondItem="qYu-MD-BuP" secondAttribute="top" constant="100" id="Lga-aO-iMK"/>
                             <constraint firstItem="2jd-dd-iO9" firstAttribute="centerX" secondItem="UTt-ap-rvw" secondAttribute="centerX" id="fDQ-Ii-ciq"/>
                             <constraint firstItem="qYu-MD-BuP" firstAttribute="trailing" secondItem="fp9-IN-ZaS" secondAttribute="trailing" constant="30" id="oqg-pJ-csi"/>
+                            <constraint firstItem="lJz-hc-1jK" firstAttribute="top" secondItem="UTt-ap-rvw" secondAttribute="top" constant="20" id="yu8-vy-ggR"/>
                         </constraints>
                     </view>
                     <connections>

@@ -31,6 +31,14 @@ class CreateJobViewController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        view.endEditing(true)
+    }
+    
+    @IBAction func cancelTapped(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil)
+    }
+    
     @IBAction func postJobTapped(_ sender: Any) {
         guard let currentUser = SessionManager.shared.currentUser else {
             print("Error: No user is currently logged in!")
