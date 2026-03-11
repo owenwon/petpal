@@ -26,6 +26,8 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
     var postedJobs: [JobRequest] = []
     var myApplications: [ApplicationResponse] = []
     
+    let refreshControl = UIRefreshControl()
+    
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
         tableView.reloadData()
         
@@ -41,7 +43,19 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
         
         tableView.dataSource = self
         tableView.delegate = self
+        
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
         fetchMyPostedJobs()
+    }
+    
+    @objc func refreshData() {
+        if segmentedControl.selectedSegmentIndex == 0 {
+            fetchMyPostedJobs()
+        } else {
+            fetchMyApplications()
+        }
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
@@ -62,7 +76,10 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
             if let data = data {
                 do {
                     self.postedJobs = try JSONDecoder().decode([JobRequest].self, from: data)
-                    DispatchQueue.main.async { self.tableView.reloadData() }
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                        self.refreshControl.endRefreshing()
+                    }
                 } catch { print("Failed to decode posts: \(error)") }
             }
         }.resume()
@@ -76,7 +93,10 @@ class MyAccountViewController: UIViewController, UITableViewDataSource, UITableV
             if let data = data {
                 do {
                     self.myApplications = try JSONDecoder().decode([ApplicationResponse].self, from: data)
-                    DispatchQueue.main.async { self.tableView.reloadData() }
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                        self.refreshControl.endRefreshing()
+                    }
                 } catch { print("Failed to decode applications: \(error)") }
             }
         }.resume()

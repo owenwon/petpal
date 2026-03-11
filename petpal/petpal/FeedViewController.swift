@@ -20,12 +20,21 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     var jobs: [JobRequest] = []
     
+    let refreshControl = UIRefreshControl()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         tableView.dataSource = self
         tableView.delegate = self
         
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
+        fetchJobs()
+    }
+    
+    @objc func refreshData() {
         fetchJobs()
     }
     
@@ -47,6 +56,7 @@ class FeedViewController: UIViewController, UITableViewDataSource, UITableViewDe
                     
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
+                        self.refreshControl.endRefreshing()
                     }
                 } catch {
                     print("Failed to decode live jobs: \(error)")

@@ -14,12 +14,22 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
     var jobId: String?
     
     var applicants: [ApplicationResponse] = []
+    
+    let refreshControl = UIRefreshControl()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.dataSource = self
         tableView.delegate = self
         // Do any additional setup after loading the view.
+        
+        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
+        fetchApplicants()
+    }
+    
+    @objc func refreshData() {
         fetchApplicants()
     }
     
@@ -33,6 +43,7 @@ class ApplicantsViewController: UIViewController, UITableViewDataSource, UITable
                     self.applicants = try JSONDecoder().decode([ApplicationResponse].self, from: data)
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
+                        self.refreshControl.endRefreshing()
                     }
                 } catch { print("Failed to decode applicants: \(error)") }
             }
