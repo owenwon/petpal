@@ -189,8 +189,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="783"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="59" translatesAutoresizingMaskIntoConstraints="NO" id="2jd-dd-iO9">
-                                <rect key="frame" x="23.333333333333343" y="159" width="346.66666666666663" height="421"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="25" translatesAutoresizingMaskIntoConstraints="NO" id="2jd-dd-iO9">
+                                <rect key="frame" x="23.333333333333343" y="139" width="346.66666666666663" height="285"/>
                                 <subviews>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Job Title (EX: Weekend Sitting)" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="PJh-F6-FzZ">
                                         <rect key="frame" x="0.0" y="0.0" width="346.66666666666669" height="37"/>
@@ -198,22 +198,22 @@
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Pet Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ovZ-TI-dxJ">
-                                        <rect key="frame" x="0.0" y="96" width="346.66666666666669" height="37"/>
+                                        <rect key="frame" x="0.0" y="62" width="346.66666666666669" height="37"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Description" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="tUk-cF-Kco">
-                                        <rect key="frame" x="0.0" y="192" width="346.66666666666669" height="37"/>
+                                        <rect key="frame" x="0.0" y="124" width="346.66666666666669" height="37"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Price" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ZiM-It-0PZ">
-                                        <rect key="frame" x="0.0" y="288" width="346.66666666666669" height="37"/>
+                                        <rect key="frame" x="0.0" y="186" width="346.66666666666669" height="37"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
                                     <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Dates" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Z7P-RP-TI3">
-                                        <rect key="frame" x="0.0" y="384" width="346.66666666666669" height="37"/>
+                                        <rect key="frame" x="0.0" y="248" width="346.66666666666669" height="37"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="24"/>
                                         <textInputTraits key="textInputTraits"/>
                                     </textField>
@@ -249,7 +249,7 @@
                             <constraint firstItem="fp9-IN-ZaS" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="qYu-MD-BuP" secondAttribute="leading" constant="20" id="CxX-Dm-Fwm"/>
                             <constraint firstItem="lJz-hc-1jK" firstAttribute="leading" secondItem="qYu-MD-BuP" secondAttribute="leading" constant="10" id="Gyq-Jk-t7X"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="lJz-hc-1jK" secondAttribute="trailing" constant="20" id="LbB-Ch-ojr"/>
-                            <constraint firstItem="2jd-dd-iO9" firstAttribute="top" secondItem="qYu-MD-BuP" secondAttribute="top" constant="100" id="Lga-aO-iMK"/>
+                            <constraint firstItem="2jd-dd-iO9" firstAttribute="top" secondItem="qYu-MD-BuP" secondAttribute="top" constant="80" id="Lga-aO-iMK"/>
                             <constraint firstItem="2jd-dd-iO9" firstAttribute="centerX" secondItem="UTt-ap-rvw" secondAttribute="centerX" id="fDQ-Ii-ciq"/>
                             <constraint firstItem="qYu-MD-BuP" firstAttribute="trailing" secondItem="fp9-IN-ZaS" secondAttribute="trailing" constant="30" id="oqg-pJ-csi"/>
                             <constraint firstItem="lJz-hc-1jK" firstAttribute="top" secondItem="UTt-ap-rvw" secondAttribute="top" constant="20" id="yu8-vy-ggR"/>
